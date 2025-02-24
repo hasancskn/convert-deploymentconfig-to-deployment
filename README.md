@@ -1,1 +1,1 @@
-# ocpconvert
+OpenShift DeploymentConfig Nesnelerini Deployment Nesnelerine Dönüştürme Rehberi
