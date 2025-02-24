@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeploymentConfig to Deployment Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .message {
+            margin-top: 20px;
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DeploymentConfig to Deployment Converter</h1>
+        <input type="file" id="fileInput" accept=".yaml,.yml">
+        <button onclick="convertFile()">Convert</button>
+        <div id="message" class="message"></div>
+        <a id="downloadLink" style="display:none;" href="#" download>
+            <button>Download Converted YAML</button>
+        </a>
+    </div>
+
+    <script>
+        async function convertFile() {
+            const fileInput = document.getElementById('fileInput');
+            const messageDiv = document.getElementById('message');
+            const downloadLink = document.getElementById('downloadLink');
+
+            if (fileInput.files.length === 0) {
+                messageDiv.innerText = "Lütfen bir dosya seçin.";
+                messageDiv.className = "error";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    messageDiv.innerText = result.message;
+                    messageDiv.className = "message";
+                    downloadLink.style.display = "block";
+                    downloadLink.href = result.download_url;
+                } else {
+                    messageDiv.innerText = result.error;
+                    messageDiv.className = "error";
+                }
+            } catch (error) {
+                messageDiv.innerText = "Bir hata oluştu: " + error.message;
+                messageDiv.className = "error";
+            }
+        }
+    </script>
+</body>
+</html>
